@@ -15,6 +15,7 @@ conv1_kernel = rand(num_conv1_kernel, kernel_size, kernel_size);
 conv1_biases = rand(1,num_conv1_kernel);
 conv1_out = zeros(num_conv1_kernel, image_size, image_size);
 conv1_pooling = zeros(num_conv1_kernel, image_size/2, image_size/2);
+conv1_pooling_location = zeros(num_conv1_kernel, image_size, image_size);
 %conv2_kernel = rand(num_conv2_kernel, kernel_size, kernel_size);
 
 fc1_weights = rand(num_conv1_kernel * image_size/2 * image_size/2,num_hidden);
@@ -36,7 +37,7 @@ for i = 1:test_size
 		kernel = reshape(conv1_kernel(num_conv1,:,:),kernel_size,kernel_size);
 		conv1_o = conv2(data,kernel,'same') + conv1_biases(1,num_conv1);
 		conv1_out(num_conv1,:,:) = conv1_o;
-		conv1_pooling(num_conv1,:,:) = pooling(conv1_o,image_size);
+		[conv1_pooling(num_conv1,:,:),conv1_pooling_location(num_conv1,:,:)] = maxpooling(conv1_o,image_size);
 	end
 	fc_input = reshape(conv1_pooling,1,num_conv1_kernel * image_size/2 * image_size/2);
 	fc1_out = fc_input * fc1_weights + fc1_biases;
@@ -46,7 +47,8 @@ for i = 1:test_size
 	fc2_out = fc1_out * fc2_weights + fc2_biases;
     normal2 = norm(fc2_out);
 
-	logits = softmax(fc2_out);
+    %logits = softmax(fc2_out / normal2);
+	logits = softmax(fc2_out - max(fc2_out));
 	loss = sum((test_label(i,:) - logits) .* (test_label(i,:) - logits)) / 2;
 	loss_sum = loss_sum + loss;
 	[arg,argmax_logits] = max(logits);
@@ -54,7 +56,7 @@ for i = 1:test_size
 	accuracy = accuracy + (argmax_logits == argmax_label);
 
 
-	derive_fc2_biases = (logits - test_label(i,:)) .* logits .* (1 - logits) / normal2;
+	derive_fc2_biases = (logits - test_label(i,:)) .* logits .* (1 - logits);% / normal2;
 	derive_fc2_weights = fc1_out' * derive_fc2_biases;
 	derive_fc1_biases = derive_fc2_biases * fc2_weights' / normal1;
 	derive_fc1_weights = fc_input' * derive_fc1_biases; 
@@ -65,7 +67,7 @@ for i = 1:test_size
 	fc1_biases = fc1_biases - learning_rate * derive_fc1_biases;
 	fc1_weights = fc1_weights - learning_rate * derive_fc1_weights;
 
-	derive_pooling = upsampling(reshape(derive_fc_input, num_conv1_kernel, image_size/2, image_size/2), image_size / 2);
+	derive_pooling = conv1_pooling_location .* upsampling(reshape(derive_fc_input, num_conv1_kernel, image_size / 2, image_size / 2), image_size / 2);
 	for num_conv1 = 1:num_conv1_kernel
 		pooling_derive = reshape(derive_pooling(num_conv1,:,:),image_size,image_size);
 		derive_conv1_biases(1,num_conv1) = sum(sum(pooling_derive)');
@@ -79,6 +81,9 @@ for i = 1:test_size
 		loss_sum = 0;
 		accuracy = accuracy / 50
 		accuracy = 0;
+	end
+	if mod(i,2000) == 0
+		learning_rate = learning_rate * 0.707;
 	end
 end
 

@@ -1,5 +1,5 @@
-load('train_dataset.mat');
-load('train_label.mat');
+%load('train_dataset.mat');
+%load('train_label.mat');
 
 train_size = 200000;
 valid_size = 10000;
@@ -7,7 +7,7 @@ test_size = 10000;
 num_classes = 10;
 image_size = 28;
 
-train_dataset = reshape(train_dataset, train_size, image_size * image_size);
+%train_dataset = reshape(train_dataset, train_size, image_size * image_size);
 
 weights = rand(image_size * image_size, num_classes);
 biases = rand(1, num_classes);

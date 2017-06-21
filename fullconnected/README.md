@@ -1,4 +1,4 @@
-# fullyconnected layer
+# fc layer
 
 ## 构造A.mat之类的文件
 
@@ -18,19 +18,49 @@ construct_data_structure.m作为单独的文件存在，是为了降低网络的
 
 在实际使用label的时候要求label为(1,num_classes)的shape，因此要提前对于train、test、valid数据集里的label进行处理。
 
-## 运行fullyconnected.m和fullyconnected.m
+## 运行fc.m和fc.m
 
-在运行fullyconnected.m和fullyconnected_batch.m的时候发现，采用单纯的sgd进行权重更新，所得到的最终的accuracy反而不低，采用batch的方法存在的问题是:
+在运行fc.m和fc_batch.m的时候发现，采用单纯的sgd进行权重更新，所得到的最终的accuracy反而不低，采用batch的方法存在的问题是:
 当batch_pass达到一定程度，就会出现loss = NaN的情况，严重影响权重更新，这就突出了validation的重要性，采用validation数据集，可以比较两个epoch对应的精度变化，如果出现两个epoch变化不大的情况，就可以停止更新权重。
 batch的方法要想得到和单样本sgd一样的精度需要更大的数据量，即train的数据集要跑不止一遍。
 
-## 运行fullyconnected_two_layers.m和fullyconnected_two_layers_batch.m
+## 运行fc_two_layers.m和fc_two_layers_batch.m
 
-在初次运行fullyconnected_two_layers.m对于fc1_output没有除去normal1和fc2_output除以normal2，以至于最终的网络运行结果精度为0.12，当对于fc2_output/normal2后，网络精度提升至0.30左右，添加对于fc1_output/normal1后，网络精度提升至0.60。(backpropagation不除以normal1和normal2，learning-rate不发生改变的情况下，train_dataset运行一遍跑出来的结果)
+在初次运行fc_two_layers.m对于fc1_output没有除去normal1和fc2_output除以normal2，以至于最终的网络运行结果精度为0.12，当对于fc2_output/normal2后，网络精度提升至0.30左右，添加对于fc1_output/normal1后，网络精度提升至0.60。(backpropagation不除以normal1和normal2，learning-rate不发生改变的情况下，train_dataset运行一遍跑出来的结果)
 不知出于什么原因，batch的运行精度要略小于单样本更新权重的最终精度。
 当将backpropagation中添加除以normal1和normal2的部分，发现将train_dataset运行20遍，最终的精度为0.54，基本达到极限，也就是说两层fc的分类精度为0.54，但对比前面的实验发现单层fc的精度反而更高。
 
-## fullyconnected_two_layers_softmax.m
+## fc_two_layers_softmax.m
 
 由于经过两层全连接层后，由于权重相乘后相加，最终x2 = x1 * w2 + b2的量级会达到立方量级，这会对于后续的softmax中exp计算带来困扰，因此造成softmax的overflow，初始的时候通过x2 / norm(x2)的方式来解决这一问题，发现最终的训练精度一直上不来，需要经过多轮训练才能够取得0.5以上的精度，但是将x2进行处理x2 - max(x2)之后，再采用softmax函数，也就是最终的softmax结果并没有发生改变，再进行训练发现训练精度在pass = 1的情况下基于能够的得到大幅度提升最终为0.78。
-反思原因: 在对于x2 / norm(x2)处理的过程中，其实是变相的改变了两层全连接层的实际分类结果，与原有产生一定程度上的偏差，这也就带来权重更新的不准确，但是x2 - max(x2)的预处理并不会带来softmax的分类结果的改变，因此很好的保留了原有分类器的分类结果，权重更新上也不会造成强度偏差。具体可以参考:![softmax-vs-softmax-loss](freemid.pluskid.org/machine-learning/softmax-vs-softmax-loss-numerical-stability/)相应的pdf为![softmax-vs-softmax-loss-numerical-stability](softmax-vs-softmax-loss-numerical-stability.pdf)
+反思原因: 在对于x2 / norm(x2)处理的过程中，其实是变相的改变了两层全连接层的实际分类结果，与原有产生一定程度上的偏差，这也就带来权重更新的不准确，但是x2 - max(x2)的预处理并不会带来softmax的分类结果的改变，因此很好的保留了原有分类器的分类结果，权重更新上也不会造成强度偏差。具体可以参考:![softmax-vs-softmax-loss](freemind.pluskid.org/machine-learning/softmax-vs-softmax-loss-numerical-stability/)相应的pdf为![softmax-vs-softmax-loss-numerical-stability](softmax-vs-softmax-loss.pdf)。
+对于fc1_output的处理，进行了a.去除normal计算 b.将normal计算改为relu，但最终的实验结果与normal计算相比都差的很远。
+
+## fc2_two_layers_relu.m
+
+对于fc1_out的结果进行了relu和sigmoid处理，fc2_output用softmax时结果都不甚理想。
+在fc2_output采用relu和sigmoid处理，fc2_output用softmax_cross_entropy时，结果精度可以达到0.7575和0.71。
+由于normal1一直保持在1000的量级，因此尝试将fc1_weights和fc1_biases在初始化限定在0.001量级，但最终发现这样并不会对于网络有任何正面影响，normal1在接下来的运算过程中仍旧保持在1000量级，具体原因不明。
+
+## fc.m和fc_softmax_cross_entropy.m
+
+|fc1_layer	|fc2_layer				|accuracy	|
+|:---------:|:---------------------:|:---------:|
+|normal		|softmax				|0.7782		|
+|relu		|softmax				|0.1051		|
+|sigmoid	|softmax				|0.2524		|
+|normal		|softmax-cross-entropy	|0.8129		|
+|relu		|softmax-cross-entropy	|0.7575		|
+|sigmoid	|softmax-cross-entropy	|0.71		|
+
+
+
+
+
+对于单层网络而言，无论采用softmax还是softmax_cross_entropy来进行权重更新，最终的网络精度差距不大。
+
+| test_bench				| accuracy	|
+|:-------------------------:|:---------:|
+|fc							|0.8323		|
+|fc_softmax_cross_entropy	|0.8259		|
+
