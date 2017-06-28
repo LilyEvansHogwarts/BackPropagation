@@ -1,5 +1,7 @@
 # dataset
 
+与fullyconnected/和conv_base/内的.mat文件相区分，借助matlab内内置矩阵的格式，将channel或图片票号变成第三坐标。
+
 ## image_deleted.sh
 
 对于notMNIST_large.tar.gz和notMNIST_small.tar.gz进行解压，并删除无法被读取的图片。
@@ -33,3 +35,4 @@ all_data_and_label;
 construct_data_structure;
 change_label;
 ```
+
