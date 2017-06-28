@@ -1,7 +1,10 @@
-load('train_dataset.mat');
-load('train_label.mat');
+%load('train_dataset.mat');
+%load('train_label.mat');
+load('test_dataset.mat');
+load('test_label.mat');
 
 train_size = 200000;
+test_size = 10000;
 num_classes = 10;
 image_size = 28;
 image_channel = 1;
@@ -27,13 +30,14 @@ fc1_weights = rand(num_fc1,image_size/4 * image_size/4 * conv2_output_channel);
 fc1_biases = rand(num_fc1,1);
 
 fc2_weights = rand(num_classes,num_fc1);
-fc2_biases = rand(num_classes);
+fc2_biases = rand(num_classes,1);
 
-for i = 1:train_size
+for i = 1:1
 	% forward
 
 	%%conv1
-	data = reshape(train_dataset(:,:,i),image_size,image_size,image_channel);
+	%data = reshape(train_dataset(:,:,i),image_size,image_size,image_channel);
+	data = reshape(test_dataset(:,:,i),image_size,image_size,image_channel);
 	conv1_out = conv_layer(data,conv1_kernel,conv1_biases);
 	[conv1_pooling_out, conv1_pooling_location] = maxpooling(conv1_out);
 	conv2_input = relu(conv1_pooling_out);
@@ -44,7 +48,7 @@ for i = 1:train_size
 	conv_output = relu(conv2_pooling_out);
 
 	%fc1
-	fc1_input = reshape(conv_output,1,image_size/4 * image_size/4 * conv2_output_channel);
+	fc1_input = reshape(conv_output,image_size/4 * image_size/4 * conv2_output_channel,1);
 	fc1_output = fc1_weights * fc1_input + fc1_biases;
 
 	%fc2
@@ -52,7 +56,8 @@ for i = 1:train_size
 	fc2_output = fc2_weights * fc2_input + fc2_biases;
 
 	%%backpropagation
-	[loss, logits, derive_fc2_biases] = softmax_cross_entropy(fc2_output,train_label(:,i),num_classes);
+	%[loss, logits, derive_fc2_biases] = softmax_cross_entropy(fc2_output,train_label(:,i),num_classes);
+	[loss, logits, derive_fc2_biases] = softmax_cross_entropy(fc2_output,test_label(:,i),num_classes);
 	derive_fc2_input = fc2_weights' * derive_fc2_biases;
 	derive_fc2_weights = derive_fc2_biases * fc2_input';
 
@@ -61,9 +66,10 @@ for i = 1:train_size
 	derive_fc1_weights = derive_fc1_biases * fc1_input';
 
 	derive_conv_out = reshape(derive_fc1_input,image_size/4,image_size/4,conv2_output_channel);
+	derive_conv_pooling = derive_conv_out .* relu_derive(conv_output);
 
-	%derive_conv2_pooling = derive_fc1_input .* relu_derive(fc1_input);
-	%derive_conv2_biases = maxpooling_derive(derive_conv2_pooling,image_size/4,conv2_pooling_location];
+	derive_conv2_biases = maxpooling(derive_conv_pooling,conv2_pooling_location);
+	derive_conv2_biases
 
 
 

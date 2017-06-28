@@ -1,4 +1,5 @@
 function result = conv_layer(data,kernel,biases)
+[image_size,image_size,input_channel] = size(data);
 [kernel_size,kernel_size,input_channel,output_channel] = size(kernel);
 result = zeros(image_size,image_size,output_channel);
 for i = 1:output_channel
