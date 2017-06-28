@@ -21,33 +21,33 @@ op4 = tf.nn.conv2d(input, filter, strides = [1,1,1,1], padding = 'VALID')
 input = tf.Variable(tf.random_normal([1,5,5,5]))
 filter = tf.Variable(tf.random_normal([3,3,5,1]))
 op5 = tf.nn.conv2d(input, filter, strides = [1,1,1,1], padding = 'SAME')
-'''
+
 #case6
 input = tf.Variable(tf.random_normal([1,5,5,5]))
 filter = tf.Variable(tf.random_normal([3,3,5,7]))
 op6 = tf.nn.conv2d(input, filter, strides = [1,1,1,1], padding = 'SAME')
-'''
+
 #case7
 input = tf.Variable(tf.random_normal([1,5,5,5]))
 filter = tf.Variable(tf.random_normal([3,3,5,7]))
 op7 = tf.nn.conv2d(input, filter, strides = [1,2,2,1], padding = 'SAME')
-
+'''
 #case8
 input = tf.Variable(tf.random_normal([10,5,5,5]))
 filter = tf.Variable(tf.random_normal([3,3,5,7]))
 op8 = tf.nn.conv2d(input, filter, strides = [1,2,2,1], padding = 'SAME')
-'''
+
 
 init = tf.initialize_all_variables()
 with tf.Session() as sess:
 	sess.run(init)
-	print('case 6')
+	print('case 8')
 	print('input')
 	print(input)
 	print('filter')
 	print(filter)
-	print(sess.run(op6))
-	print(op6.get_shape().as_list())
+	print(sess.run(op8))
+	print(op8.get_shape().as_list())
 '''
 	print('case 2')
 	print(sess.run(op2))

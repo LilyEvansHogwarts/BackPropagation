@@ -42,7 +42,7 @@ batch的方法要想得到和单样本sgd一样的精度需要更大的数据量
 在fc2_output采用relu和sigmoid处理，fc2_output用softmax_cross_entropy时，结果精度可以达到0.7575和0.71。
 由于normal1一直保持在1000的量级，因此尝试将fc1_weights和fc1_biases在初始化限定在0.001量级，但最终发现这样并不会对于网络有任何正面影响，normal1在接下来的运算过程中仍旧保持在1000量级，具体原因不明。
 
-## fc.m和fc_softmax_cross_entropy.m
+在此表中fc2_layer对应的softmax以及softmax-cross-entropy均是进行了fc2_output - max(fc2_output)处理。
 
 |fc1_layer	|fc2_layer				|accuracy	|
 |:---------:|:---------------------:|:---------:|
@@ -53,9 +53,7 @@ batch的方法要想得到和单样本sgd一样的精度需要更大的数据量
 |relu		|softmax-cross-entropy	|0.7575		|
 |sigmoid	|softmax-cross-entropy	|0.71		|
 
-
-
-
+## fc.m和fc_softmax_cross_entropy.m
 
 对于单层网络而言，无论采用softmax还是softmax_cross_entropy来进行权重更新，最终的网络精度差距不大。
 
