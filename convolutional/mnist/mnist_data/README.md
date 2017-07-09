@@ -20,22 +20,22 @@
 
 运行求得:
 	test_image/
-	test_dataset.mat
+	test_dataset.mat (28,28,10000)
 
 ## train_image_readfile.m
 
 运行求得:
 	train_image/
-	train_dataset.mat
+	train_dataset.mat (28,28,60000)
 
 ## test_label_readfile.m
 
 运行求得:
-	test_label.mat
+	test_label.mat (10,10000)
 
 ## train_label_readfile.m
 
 运行求得:
-	train_label.mat
+	train_label.mat (10,60000)
 
 

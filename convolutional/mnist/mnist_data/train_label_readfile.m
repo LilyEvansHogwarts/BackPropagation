@@ -11,11 +11,13 @@ if ((MagicNum ~= 2049) || (LabelNum ~= 60000))
 	return;
 end
 
-train_label = zeros(1,LabelNum);
+A = eye(10);
+train_label = zeros(10,LabelNum);
 
 h_w = waitbar(0,'please, wait for a moment>>');
 for i = 1:LabelNum
-	train_label(1,i) = fread(fid,1,'uint8');
+	b = fread(fid,1,'uint8');
+	train_label(:,i) = A(:,b+1);
 	waitbar(i/LabelNum);
 end
 

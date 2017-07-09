@@ -10,12 +10,13 @@ if ((MagicNum ~= 2049) || (LabelNum ~= 10000))
 	fclose(fid);
 	return;
 end
-
-test_label = zeros(1,LabelNum);
+A = eye(10);
+test_label = zeros(10,LabelNum);
 
 h_w = waitbar(0,'please, wait for a moment>>');
 for i = 1:LabelNum
-	test_label(1,i) = fread(fid,1,'uint8');
+	b = fread(fid,1,'uint8');
+	test_label(:,i) = A(:,b+1);
 	waitbar(i/LabelNum);
 end
 
