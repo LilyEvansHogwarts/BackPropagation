@@ -1,3 +1,4 @@
+%format long;
 %load('train_dataset.mat');
 %load('train_label.mat');
 load('test_dataset.mat');
@@ -15,22 +16,22 @@ conv1_input_channel = image_channel;
 conv1_kernel_size = 5;
 conv1_output_channel = 16;
 
-conv1_kernel = rand(conv1_kernel_size,conv1_kernel_size,conv1_input_channel,conv1_output_channel);
-conv1_biases = rand(1,conv1_output_channel);
+conv1_kernel = 0.1 * randn(conv1_kernel_size,conv1_kernel_size,conv1_input_channel,conv1_output_channel);
+conv1_biases = 0.1 * ones(1,conv1_output_channel);
 
 conv2_input_channel = conv1_output_channel;
 conv2_kernel_size = 5;
 conv2_output_channel = 16;
 
-conv2_kernel = rand(conv2_kernel_size,conv2_kernel_size,conv2_input_channel,conv2_output_channel);
-conv2_biases = rand(1,conv2_output_channel);
+conv2_kernel = 0.1 * randn(conv2_kernel_size,conv2_kernel_size,conv2_input_channel,conv2_output_channel);
+conv2_biases = 0.1 * ones(1,conv2_output_channel);
 
 num_fc1 = 64;
-fc1_weights = rand(num_fc1,image_size/4 * image_size/4 * conv2_output_channel);
-fc1_biases = rand(num_fc1,1);
+fc1_weights = 0.1 * randn(num_fc1,image_size/4 * image_size/4 * conv2_output_channel);
+fc1_biases = 0.1 * ones(num_fc1,1);
 
-fc2_weights = rand(num_classes,num_fc1);
-fc2_biases = rand(num_classes,1);
+fc2_weights = 0.1 * randn(num_classes,num_fc1);
+fc2_biases = 0.1 * ones(num_classes,1);
 
 accuracy = 0;
 loss_sum = 0;
