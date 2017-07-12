@@ -24,7 +24,7 @@ num_classes = 10;
 fc2_weights = 0.1 * randn(num_classes,fc1_size);
 fc2_biases = 0.1 * ones(num_classes,1);
 
-learning_rate = 0.0001;
+learning_rate = 0.00001;
 loss_sum = 0;
 accuracy = 0;
 pass = 1;
