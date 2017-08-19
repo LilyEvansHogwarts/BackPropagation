@@ -42,8 +42,7 @@ for j = 1:pass
 
 	fc2_out = fc2_weights * fc1_out + fc2_biases;
 
-	[loss,logits,derive_fc2_biases] = softmax_cross_entropy_new(fc2_out,test_label(:,i),num_classes);
-	%[loss,logits,derive_fc2_biases] = softmax_cross_entropy(fc2_out,test_label(:,i),num_classes);
+	[loss,logits,derive_fc2_biases] = softmax_cross_entropy(fc2_out,test_label(:,i),num_classes);
 	derive_fc2_weights = derive_fc2_biases * fc1_out';
 	derive_fc2_input = fc2_weights' * derive_fc2_biases;
 
